@@ -1,8 +1,8 @@
 package dsp
 
 // FilterByEWMA filters the signal using low pass filter based on exponential moving weighted moving average
-func FilterByEWMA(signal []float32, alpha float32) []float32 {
-	var newValues []float32
+func FilterByEWMA(signal []float64, alpha float64) []float64 {
+	var newValues []float64
 	filt := signal[0]
 	for index := range signal {
 		filt = alpha*filt + (1-alpha)*signal[index]
