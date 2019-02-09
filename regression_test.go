@@ -20,6 +20,22 @@ func TestLeastSquares(t *testing.T) {
 		},
 		testCase{
 			[]Point{
+				{1, 1},
+				{2, 2},
+				{3, 5},
+				{4, 10},
+			}, 3, -3,
+		},
+		testCase{
+			[]Point{
+				{1, 1},
+				{2, 2},
+				{3, 3},
+				{4, 4},
+			}, 1, 0,
+		},
+		testCase{
+			[]Point{
 				{1, 10},
 				{2, 8},
 				{3, 7},
