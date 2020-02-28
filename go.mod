@@ -1,3 +1,3 @@
 module github.com/stryd/dsp
 
-go 1.12
+go 1.14

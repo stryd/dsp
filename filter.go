@@ -1,5 +1,7 @@
 package dsp
 
+import "math"
+
 // FilterByEWMA filters the signal using low pass filter based on exponential moving weighted moving average
 func FilterByEWMA(signal []float64, alpha float64) []float64 {
 	var newValues []float64
@@ -53,8 +55,22 @@ func filter(b, a, y []float64) []float64 {
 	return yy
 }
 
+func filterCoeffs(cutoffFreq float64) ([]float64, []float64) {
+	ita := 1.0 / math.Tan(math.Pi*cutoffFreq)
+	q := math.Sqrt(2.0)
+	a, b := make([]float64, 3), make([]float64, 3)
+	b[0] = 1.0 / (1.0 + q*ita + ita*ita)
+	b[1] = 2 * b[0]
+	b[2] = b[0]
+	a[0] = 1.0
+	a[1] = -2.0 * (ita*ita - 1.0) * b[0]
+	a[2] = (1.0 - q*ita + ita*ita) * b[0]
+	return a, b
+}
+
 // Filtfilt filters the signal using IIR 2nd order zero phase filter
-func Filtfilt(b, a, y []float64) []float64 {
+func IIRFilter(cutoffFreq float64, y []float64) []float64 {
+	a, b := filterCoeffs(cutoffFreq)
 	var yy []float64
 	yy = append(yy, y...)
 	yy = append(yy, flip(y)...)
