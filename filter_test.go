@@ -20,7 +20,7 @@ func TestIITFilter(t *testing.T) {
 		},
 	}
 	for _, c := range cases {
-		got := IIRFilter(c.freq, c.signal)
+		got := FilterByIIR(c.signal, c.freq)
 		if !reflect.DeepEqual(got, c.want) {
 			t.Errorf("Filter test failed: got %+v, want %+v", got, c.want)
 		}

@@ -69,20 +69,20 @@ func filterCoeffs(cutoffFreq float64) ([]float64, []float64) {
 }
 
 // Filtfilt filters the signal using IIR 2nd order zero phase filter
-func IIRFilter(cutoffFreq float64, y []float64) []float64 {
+func FilterByIIR(signal []float64, cutoffFreq float64) []float64 {
 	a, b := filterCoeffs(cutoffFreq)
-	var yy []float64
-	yy = append(yy, y...)
-	yy = append(yy, flip(y)...)
+	var ss []float64
+	ss = append(ss, signal...)
+	ss = append(ss, flip(signal)...)
 
 	// Filter forwards
-	yy = filter(b, a, yy)
+	ss = filter(b, a, ss)
 	// Reverse time
-	yy = flip(yy)
+	ss = flip(ss)
 	// Filter backwards
-	yy = filter(b, a, yy)
+	ss = filter(b, a, ss)
 	// Re-reverse time back to normal
-	yy = flip(yy)
+	ss = flip(ss)
 
-	return yy[:len(y)]
+	return ss[:len(signal)]
 }
