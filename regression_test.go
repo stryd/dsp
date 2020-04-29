@@ -84,3 +84,50 @@ func TestPolynomial(t *testing.T) {
 		}
 	}
 }
+
+/*
+func TestPolynomialRealData(t *testing.T) {
+	file, err := os.Open("./poly_data")
+	if err != nil {
+		t.Errorf("Failed to read data file")
+		return
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	var lines []string
+	for scanner.Scan() {
+		lines = append(lines, scanner.Text())
+	}
+	reListStr := lines[0]
+	gradeListStr := lines[1]
+	reStr := strings.Split(reListStr, ",")
+	gradeStr := strings.Split(gradeListStr, ",")
+	res := make([]float64, 0)
+	grades := make([]float64, 0)
+	for i := 0; i < len(reStr); i++ {
+		if re, err := strconv.ParseFloat(reStr[i], 64); err == nil {
+			res = append(res, re)
+		}
+
+		if grade, err := strconv.ParseFloat(gradeStr[i], 64); err == nil {
+			grades = append(grades, grade)
+		}
+	}
+
+	res = res[2000:2100]
+	grades = grades[2000:2100]
+	fmt.Println(res, grades)
+	degree := 2
+	dense, err := Polynomial(grades, res, degree)
+	if err != nil {
+		t.Errorf("Failed the polynomial regression test: %v", err)
+		return
+	}
+	coeffs := make([]float64, degree+1)
+	for i := 0; i < degree+1; i++ {
+		coeffs[i] = math.Round(dense.At(i, 0))
+	}
+	fmt.Println(coeffs)
+}
+*/
