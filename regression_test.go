@@ -4,6 +4,8 @@ import (
 	"math"
 	"reflect"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestLeastSquares(t *testing.T) {
@@ -13,7 +15,7 @@ func TestLeastSquares(t *testing.T) {
 		wantIntercept float64
 	}
 	cases := []testCase{
-		testCase{
+		{
 			[]Point{
 				{1, 6},
 				{2, 5},
@@ -21,7 +23,7 @@ func TestLeastSquares(t *testing.T) {
 				{4, 10},
 			}, 1.4, 3.5,
 		},
-		testCase{
+		{
 			[]Point{
 				{1, 1},
 				{2, 2},
@@ -29,7 +31,7 @@ func TestLeastSquares(t *testing.T) {
 				{4, 10},
 			}, 3, -3,
 		},
-		testCase{
+		{
 			[]Point{
 				{1, 1},
 				{2, 2},
@@ -37,7 +39,7 @@ func TestLeastSquares(t *testing.T) {
 				{4, 4},
 			}, 1, 0,
 		},
-		testCase{
+		{
 			[]Point{
 				{1, 10},
 				{2, 8},
@@ -47,10 +49,10 @@ func TestLeastSquares(t *testing.T) {
 		},
 	}
 	for _, c := range cases {
-		slope, intercept := LeastSquares(&c.points)
-		if slope != c.wantSlope || intercept != c.wantIntercept {
-			t.Errorf("Least squares calculation is wrong, for slope, want %v, got %v; for intercept, want %v, got %v", c.wantSlope, slope, c.wantIntercept, intercept)
-		}
+		slope, intercept, err := LeastSquares(&c.points)
+		assert.NoError(t, err)
+		assert.Equal(t, c.wantSlope, slope)
+		assert.Equal(t, c.wantIntercept, intercept)
 	}
 
 }
@@ -63,7 +65,7 @@ func TestPolynomial(t *testing.T) {
 		want   []float64
 	}
 	cases := []testCase{
-		testCase{
+		{
 			[]float64{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
 			[]float64{1, 6, 17, 34, 57, 86, 121, 162, 209, 262, 321},
 			2,

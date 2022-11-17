@@ -1,6 +1,10 @@
 package dsp
 
-import "gonum.org/v1/gonum/mat"
+import (
+	"fmt"
+
+	"gonum.org/v1/gonum/mat"
+)
 
 // Point holds the coordinates of the points used for regression
 type Point struct {
@@ -10,9 +14,12 @@ type Point struct {
 
 // LeastSquares returns implements the linear regression based on the method of least squares
 // y = ax + b
-func LeastSquares(points *[]Point) (slope float64, intercept float64) {
-	n := float64(len(*points))
+func LeastSquares(points *[]Point) (slope float64, intercept float64, err error) {
+	if len(*points) == 0 {
+		return 0, 0, fmt.Errorf("no points provided")
+	}
 
+	n := float64(len(*points))
 	sumX := 0.0
 	sumY := 0.0
 	sumXY := 0.0
@@ -29,7 +36,7 @@ func LeastSquares(points *[]Point) (slope float64, intercept float64) {
 	slope = (n*sumXY - sumX*sumY) / base
 	intercept = (sumXX*sumY - sumXY*sumX) / base
 
-	return slope, intercept
+	return slope, intercept, nil
 }
 
 func Polynomial(x, y []float64, degree int) (*mat.Dense, error) {
