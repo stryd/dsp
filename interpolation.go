@@ -77,10 +77,10 @@ func Interpolate(values []float64, size int) []float64 {
  */
 func InterP1(xList, vList []float64, queryList []float64) ([]float64, error) {
 	if len(xList) != len(vList) {
-		return nil, fmt.Errorf("Arrays of sample points xs and corresponding values vs have to have equal length.: %d vs. %d\n", len(xList), len(vList))
+		return nil, fmt.Errorf("arrays of sample points xList and corresponding values vList have to have equal length.: %d vs. %d\n", len(xList), len(vList))
 	}
 	if len(xList) == 0 {
-		return nil, fmt.Errorf("Arrays of sample points xs and corresponding values vs have to have length > 0.")
+		return nil, fmt.Errorf("arrays of sample points xList and corresponding values vList have to have length > 0.")
 	}
 
 	type Zip struct {
@@ -100,7 +100,7 @@ func InterP1(xList, vList []float64, queryList []float64) ([]float64, error) {
 	// Check for double x values
 	for i, v := range p[1:] {
 		if p[i].X == v.X {
-			return nil, fmt.Errorf("Two sample points have equal value %f. This is not allowed.", v.X)
+			return nil, fmt.Errorf("two sample points have equal value %f. This is not allowed.", v.X)
 		}
 	}
 
@@ -119,7 +119,7 @@ func InterP1(xList, vList []float64, queryList []float64) ([]float64, error) {
 
 		// Check if value lies in interpolation range.
 		if index == -1.0 {
-			return nil, fmt.Errorf("Query value %f lies outside of range. Extrapolation is not supported.", xq)
+			return nil, fmt.Errorf("query value %f lies outside of range. Extrapolation is not supported.", xq)
 		}
 
 		r = append(r, interpolateFloat(sortedV, index))
