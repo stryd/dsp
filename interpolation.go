@@ -1,7 +1,9 @@
 package dsp
 
 import (
+	"fmt"
 	"math"
+	"sort"
 )
 
 // Span generates `size` equidistant points spanning [min,max]
@@ -59,4 +61,134 @@ func Interpolate(values []float64, size int) []float64 {
 	valuesNew[0] = values[0]
 	valuesNew[size-1] = values[oldSize-1]
 	return valuesNew
+}
+
+/**
+ * InterP1 simulate the interp1 method in matlab.
+ * It returns interpolated values of a 1-D function at specific query points using linear interpolation.
+ *
+ * This is ported from the js code which is ported from the matlab code:
+ * https://www.npmjs.com/package/interp1?activeTab=code
+ *
+ * @param  xList        Array of independent sample points.
+ * @param  vList        Array of dependent values v(x) with length equal to xList.
+ * @param  qeuryList    Array of coordinates of the query points.
+ * @return              Interpolated values with length equal to queryList.
+ */
+func InterP1(xList, vList []float64, queryList []float64) ([]float64, error) {
+	if len(xList) != len(vList) {
+		return nil, fmt.Errorf("Arrays of sample points xs and corresponding values vs have to have equal length.: %d vs. %d\n", len(xList), len(vList))
+	}
+	if len(xList) == 0 {
+		return nil, fmt.Errorf("Arrays of sample points xs and corresponding values vs have to have length > 0.")
+	}
+
+	type Zip struct {
+		X, V float64
+	}
+	// Combine x and v
+	p := []Zip{}
+	for i := range xList {
+		p = append(p, Zip{xList[i], vList[i]})
+	}
+
+	// Sort asc
+	sort.Slice(p, func(i, j int) bool {
+		return p[i].X < p[j].X
+	})
+
+	// Check for double x values
+	for i, v := range p[1:] {
+		if p[i].X == v.X {
+			return nil, fmt.Errorf("Two sample points have equal value %f. This is not allowed.", v.X)
+		}
+	}
+
+	// Split
+	sortedX, sortedV := []float64{}, []float64{}
+	for _, v := range p {
+		sortedX = append(sortedX, v.X)
+		sortedV = append(sortedV, v.V)
+	}
+
+	// Interpolate
+	r := []float64{}
+	for _, xq := range queryList {
+		// Determine index of range of query value.
+		index := binaryFindIndex(sortedX, xq)
+
+		// Check if value lies in interpolation range.
+		if index == -1.0 {
+			return nil, fmt.Errorf("Query value %f lies outside of range. Extrapolation is not supported.", xq)
+		}
+
+		r = append(r, interpolateFloat(sortedV, index))
+	}
+
+	return r, nil
+}
+
+/**
+ * interpolateFloat applies linear interpolation on a value based on index.
+ * The index is allowed to be an non-integer. Used by InterP1D.
+ *
+ * This is ported from the js code which is ported from the matlab code:
+ * https://www.npmjs.com/package/interp1?activeTab=code
+ *
+ * @param  values Array of values to interpolate between.
+ * @param  index  Index of new to be interpolated value.
+ * @return        Interpolated value.
+ */
+func interpolateFloat(values []float64, index float64) float64 {
+	if index > float64(len(values)-1) {
+		return 0
+	}
+	prev := math.Floor(index)
+	next := math.Ceil(index)
+	lambda := index - prev
+	return (1-lambda)*values[int(prev)] + lambda*values[int(next)]
+}
+
+/**
+ * Finds the index of range in which a query value is included in a sorted
+ * array with binary search. Used by InterP1D.
+ *
+ * This is ported from the js code which is ported from the matlab code:
+ * https://www.npmjs.com/package/interp1?activeTab=code
+ *
+ * @param   values Array sorted in ascending order.
+ * @param   qValue Query value.
+ * @return         Index of range plus percentage to next index.
+ */
+func binaryFindIndex(values []float64, qValue float64) float64 {
+	// Special case of only one element in array.
+	if len(values) == 1 && values[0] == qValue {
+		return 0.0
+	}
+
+	// Determine bounds.
+	lower := 0
+	upper := len(values) - 1
+
+	// Find index of range.
+	for lower < upper {
+		// Determine test range.
+		mid := math.Floor(float64(lower+upper) / 2.0)
+		prev := values[int(mid)]
+		next := values[int(mid)+1]
+
+		if qValue < prev {
+			// Query value is below range.
+			upper = int(mid)
+		} else if qValue > next {
+			// Query value is above range.
+			lower = int(mid) + 1
+		} else {
+			// Query value is in range.
+			return mid + (qValue-prev)/(next-prev)
+		}
+	}
+
+	// Range not found.
+	return -1.0
 }
