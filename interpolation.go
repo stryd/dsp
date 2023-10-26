@@ -79,7 +79,8 @@ func InterP1(xList, vList []float64, queryList []float64) ([]float64, error) {
 	if len(xList) != len(vList) {
 		return nil, fmt.Errorf("arrays of sample points xList and corresponding values vList have to have equal length.: %d vs. %d\n", len(xList), len(vList))
 	}
-	if len(xList) == 0 {
+	size := len(xList)
+	if size == 0 {
 		return nil, fmt.Errorf("arrays of sample points xList and corresponding values vList have to have length > 0.")
 	}
 
@@ -87,9 +88,9 @@ func InterP1(xList, vList []float64, queryList []float64) ([]float64, error) {
 		X, V float64
 	}
 	// Combine x and v
-	p := []Zip{}
+	p := make([]Zip, size)
 	for i := range xList {
-		p = append(p, Zip{xList[i], vList[i]})
+		p[i] = Zip{xList[i], vList[i]}
 	}
 
 	// Sort asc
@@ -98,14 +99,17 @@ func InterP1(xList, vList []float64, queryList []float64) ([]float64, error) {
 	})
 
 	// Check for double x values
-	for i, v := range p[1:] {
-		if p[i].X == v.X {
-			return nil, fmt.Errorf("two sample points have equal value %f. This is not allowed.", v.X)
+	for i := range p {
+		if i == 0 {
+			continue
+		}
+		if p[i].X == p[i-1].X {
+			return nil, fmt.Errorf("two sample points have equal value %f. This is not allowed.", p[i].X)
 		}
 	}
 
 	// Split
-	sortedX, sortedV := []float64{}, []float64{}
+	sortedX, sortedV := make([]float64, size), make([]float64, size)
 	for _, v := range p {
 		sortedX = append(sortedX, v.X)
 		sortedV = append(sortedV, v.V)
