@@ -110,9 +110,9 @@ func InterP1(xList, vList []float64, queryList []float64) ([]float64, error) {
 
 	// Split
 	sortedX, sortedV := make([]float64, size), make([]float64, size)
-	for _, v := range p {
-		sortedX = append(sortedX, v.X)
-		sortedV = append(sortedV, v.V)
+	for i := range p {
+		sortedX[i] = p[i].X
+		sortedV[i] = p[i].V
 	}
 
 	// Interpolate
